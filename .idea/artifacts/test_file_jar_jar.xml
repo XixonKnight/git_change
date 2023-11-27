@@ -3,6 +3,12 @@
     <output-path>$PROJECT_DIR$/out/artifacts/test_file_jar_jar</output-path>
     <root id="archive" name="test_file_jar.jar">
       <element id="module-output" name="test_file_jar" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/eclipse/jgit/org.eclipse.jgit/6.7.0.202309050840-r/org.eclipse.jgit-6.7.0.202309050840-r.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-log4j12/1.7.26/slf4j-log4j12-1.7.26.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/googlecode/javaewah/JavaEWAH/1.2.3/JavaEWAH-1.2.3.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

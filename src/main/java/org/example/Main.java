@@ -12,15 +12,22 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException, GitAPIException {
-        System.out.println("Hello world!");
+        FileSystemView fileSystemView = FileSystemView.getFileSystemView();
+        String desktopPath = fileSystemView.getHomeDirectory().getPath();
+        final String FILE_PATH_JAVA = desktopPath + "\\File_Change\\Java\\";
+        final String FILE_PATH_OTHER = desktopPath + "\\File_Change\\Other\\";
         BasicConfigurator.configure();
         // Đường dẫn đến thư mục repository
-        String repositoryPath = "D:/demo/demo";
+        String repositoryPath = System.getProperty("user.dir");
 
         // Tạo đối tượng Git từ đường dẫn repository
         try (Git git = Git.open(new File(repositoryPath))) {
@@ -28,7 +35,7 @@ public class Main {
             ObjectId masterCommitId = git.getRepository().resolve("master");
 
             // Lấy ra ObjectId của commit trên nhánh khác
-            ObjectId otherCommitId = git.getRepository().resolve("test-file");
+            ObjectId otherCommitId = git.getRepository().resolve("HEAD");
 
             // Lấy ra danh sách các tệp thay đổi giữa hai commit
             List<DiffEntry> diffEntries = git.diff()
@@ -37,16 +44,17 @@ public class Main {
                     .call();
             // Sao chép các tệp thay đổi vào một thư mục
             for (DiffEntry diffEntry : diffEntries) {
-                if (diffEntry.getNewPath() == "/dev/null") {
+                if (diffEntry.getNewPath() == "\\dev\\null") {
                     continue;
                 }
                 String[] path = diffEntry.getNewPath().split("/");
                 String pathFile = path[path.length - 1];
-                File file = new File("D:/save_file/" + pathFile);
-                File fileBefore = new File("D:/save_file/" + "before" + pathFile);
-                if (!file.getName().endsWith(".java")) {
+                if (!pathFile.endsWith(".java")) {
+                    copyFileOtherJava(pathFile, diffEntry.getNewPath(), repositoryPath, FILE_PATH_OTHER);
                     continue;
                 }
+                File file = new File(FILE_PATH_JAVA + pathFile);
+                File fileBefore = new File(FILE_PATH_JAVA + "before" + pathFile);
                 file.getParentFile().mkdirs();
                 try (FileOutputStream fos = new FileOutputStream(fileBefore)) {
                     DiffFormatter diffFormatter = new DiffFormatter(fos);
@@ -74,7 +82,7 @@ public class Main {
                 reader.close();
                 writer.close();
             }
-            String folderPath = "D:/save_file";
+            String folderPath = FILE_PATH_JAVA;
             File folder = new File(folderPath);
 
             if (folder.exists() && folder.isDirectory()) {
@@ -101,4 +109,31 @@ public class Main {
         }
 
     }
+    private static void copyFileOtherJava(String fileName,String pathFile, String pathRoot, String pathSaveRoot){
+        try {
+            Path sourceFile = Path.of(pathRoot + "\\" +pathFile);
+            Path destinationFile =  Path.of(pathSaveRoot + fileName);
+            // Create parent directories of the destination file if they don't exist
+            Files.createDirectories(destinationFile.getParent());
+
+            // Create the destination file if it doesn't exist
+            if (!Files.exists(destinationFile)) {
+                Files.createFile(destinationFile);
+            }
+
+            try (InputStream inputStream = Files.newInputStream(sourceFile);
+                 OutputStream outputStream = Files.newOutputStream(destinationFile)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to copy the file.");
+        }
+    }
+
+
 }
